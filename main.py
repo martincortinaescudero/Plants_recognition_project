@@ -33,30 +33,14 @@ if st.checkbox("Display"):
       history_loss.extend(history['loss'])
       history_val_loss.extend(history['val_loss'])
 
-  
-  # Crear una figura y ejes para el gráfico
-  #fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(14, 6))
-  
-  # Graficar la precisión (accuracy) en función de las épocas
-  #axes[0].plot(history_acc, label='Train Accuracy')
-  #axes[0].plot(history_val_acc, label='Validation Accuracy')
-  #axes[0].set_title('Accuracy')
-  #axes[0].set_xlabel('Epoch')
-  #axes[0].set_ylabel('Accuracy')
-  #axes[0].legend()
+  # Crear un DataFrame de pandas con los datos
+  df = pd.DataFrame({'Epoch': range(1, len(history_val_acc) + 1),
+                     'Train Accuracy': history_acc,
+                     'Validation Accuracy': history_val_acc})
 
-  #axes[1].plot(history_loss, label='Train Loss')
-  #axes[1].plot(history_val_loss, label='Validation Loss')
-  #axes[1].set_title('Loss')
-  #axes[1].set_xlabel('Epoch')
-  #axes[1].set_ylabel('Loss')
-  #axes[1].legend()
-
-  #plt.tight_layout()
-  #plt.show()
-
-
-  fig = sns.catplot(x='Epoch', y='Accuracy', data=history_val_acc, kind='point')
+  # Crear un gráfico de puntos usando seaborn
+  fig = sns.catplot(x='Epoch', y='Validation Accuracy', data=df, kind='point')
+  plt.title('Validation Accuracy vs. Epoch')
   st.pyplot(fig)
 
   st.write("Done!")
