@@ -7,6 +7,8 @@ if st.checkbox("Display"):
   # load my model and history
   ######################################################
   import pickle
+  import numpy as np
+  import matplotlib.pyplot as plt
   import keras
   from keras.models import load_model
 
@@ -17,8 +19,8 @@ if st.checkbox("Display"):
   with open('/content/drive/MyDrive/Colab Notebooks/histories_resize_15-15.pkl', 'rb') as file:
       history_list = pickle.load(file)
 
-  import numpy as np
-  import matplotlib.pyplot as plt
+  
+  
 
   # Crear una figura y ejes para el gráfico
   fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(14, 6))
