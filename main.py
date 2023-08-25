@@ -12,7 +12,7 @@ if st.checkbox("Display"):
   import matplotlib.pyplot as plt
   from keras.models import load_model
   import seaborn as sns
-
+  import pandas as pd
   
   # Cargar el modelo
   #model = load_model('model_resize_15-15.h5')
