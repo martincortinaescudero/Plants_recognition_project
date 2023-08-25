@@ -1,4 +1,1 @@
-# no extra dependencies would be needed since pandas and numpy are installed as direct dependencies of streamlit. Similarly, math and random are built into Python.
-#streamlit
-pickle
 keras
