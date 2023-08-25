@@ -20,9 +20,6 @@ if st.checkbox("Display"):
   with open('histories_resize_15-15.pkl', 'rb') as file:
       history_list = pickle.load(file)
 
-  
-  
-
   # Crear una figura y ejes para el gráfico
   fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(14, 6))
 
@@ -54,4 +51,5 @@ if st.checkbox("Display"):
   axes[1].legend()
 
   plt.tight_layout()
-  plt.show()
+  #plt.show()
+  st.pyplot(fig)
