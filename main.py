@@ -7,8 +7,8 @@ if st.checkbox("Display"):
   # load my model and history
   ######################################################
   import pickle
-  import matplotlib.pyplot as plt
   import keras
+  import matplotlib.pyplot as plt
   from keras.models import load_model
   import numpy as np
   
