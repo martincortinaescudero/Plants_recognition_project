@@ -11,6 +11,7 @@ if st.checkbox("Display"):
   import keras
   import matplotlib.pyplot as plt
   from keras.models import load_model
+  import seaborn as sns
 
   
   # Cargar el modelo
