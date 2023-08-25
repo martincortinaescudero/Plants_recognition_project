@@ -14,10 +14,10 @@ if st.checkbox("Display"):
 
   
   # Cargar el modelo
-  #model = load_model('/content/drive/MyDrive/Colab Notebooks/model_resize_15-15.h5')
+  #model = load_model('model_resize_15-15.h5')
 
   # Cargar la lista de historias
-  with open('/content/drive/MyDrive/Colab Notebooks/histories_resize_15-15.pkl', 'rb') as file:
+  with open('histories_resize_15-15.pkl', 'rb') as file:
       history_list = pickle.load(file)
 
   
