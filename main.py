@@ -10,7 +10,7 @@ if st.checkbox("Display"):
   from keras.models import load_model
 
   # Cargar el modelo
-  model = load_model('/content/drive/MyDrive/Colab Notebooks/model_resize_15-15.h5')
+  #model = load_model('/content/drive/MyDrive/Colab Notebooks/model_resize_15-15.h5')
 
   # Cargar la lista de historias
   with open('/content/drive/MyDrive/Colab Notebooks/histories_resize_15-15.pkl', 'rb') as file:
