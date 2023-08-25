@@ -7,10 +7,11 @@ if st.checkbox("Display"):
   # load my model and history
   ######################################################
   import pickle
+  import numpy as np
   import keras
   import matplotlib.pyplot as plt
   from keras.models import load_model
-  import numpy as np
+
   
   # Cargar el modelo
   #model = load_model('/content/drive/MyDrive/Colab Notebooks/model_resize_15-15.h5')
