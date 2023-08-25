@@ -1,8 +1,8 @@
 import streamlit as st
-st.title("My second Streamlit")
+st.title("VGG16 Model")
 st.write("Introduction")
 if st.checkbox("Display"):
-  st.write("Streamlit continuation")
+  st.write("Plot accuracy")
   ######################################################
   # load my model and history
   ######################################################
@@ -57,3 +57,5 @@ if st.checkbox("Display"):
 
   fig = sns.catplot(x='Epoch', y='Accuracy', data=history_val_acc, kind='point')
   st.pyplot(fig)
+
+  st.write("Done!")
