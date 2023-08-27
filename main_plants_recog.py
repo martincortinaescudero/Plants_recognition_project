@@ -172,101 +172,15 @@ if page == pages[2] :
 if page == pages[3] : 
     st.write("### Interpreting")
 
-    ##############################################
-    # Definir una función para Grad-CAM:
-    ##############################################
-
-    def grad_cam(model, image, layer_name):
-        last_conv_layer = model.get_layer(layer_name)
-        gradient_model = tf.keras.models.Model([model.inputs], [model.output, last_conv_layer.output])
-       
-        with tf.GradientTape() as tape:
-            preds, conv_output = gradient_model(image)
-            class_output = preds
-
-        grads = tape.gradient(class_output, conv_output)
-        pooled_grads = tf.reduce_mean(grads, axis=(0, 1, 2))
-
-        #heatmap = tf.reduce_mean(conv_output * pooled_grads[..., tf.newaxis], axis=-1)
-        conv_output = conv_output[0]
-        heatmap = conv_output @ pooled_grads[..., tf.newaxis]
-        heatmap = tf.squeeze(heatmap)
-        ########
-
-        heatmap = tf.maximum(heatmap, 0)
-        heatmap /= tf.reduce_max(heatmap)
-
-        return heatmap.numpy()
-
-    ##############################################
-    # Definir una función resultado superpuesto:
-    ##############################################
-
-    def display_gradcam(img_path, heatmap, cam_path="cam.jpg", alpha=0.4):
-        # Load the original image
-        img = keras.utils.load_img(img_path)
-        img = keras.utils.img_to_array(img)
-
-        # Rescale heatmap to a range 0-255
-        heatmap = np.uint8(255 * heatmap)
-
-        # Use jet colormap to colorize heatmap
-        jet = cm.get_cmap("jet")
-
-        # Use RGB values of the colormap
-        jet_colors = jet(np.arange(256))[:, :3]
-        jet_heatmap = jet_colors[heatmap]
-
-        # Create an image with RGB colorized heatmap
-        jet_heatmap = keras.utils.array_to_img(jet_heatmap)
-        jet_heatmap = jet_heatmap.resize((img.shape[1], img.shape[0]))
-        jet_heatmap = keras.utils.img_to_array(jet_heatmap)
-
-        # Superimpose the heatmap on original image
-        superimposed_img = jet_heatmap * alpha + img
-        superimposed_img = keras.utils.array_to_img(superimposed_img)
-
-        # Display Grad CAM
-        #display(Image(cam_path))
-        # Display Grad CAM
-        st.image(superimposed_img, caption='Grad CAM', use_column_width=True)
-
-    ##############################################
-    # Definir funcion para Preprocesar la imagen
-    ##############################################
-
-    def preproces_image(img_path):
-        img = image.load_img(img_path, target_size=(224, 224))
-        x = image.img_to_array(img)
-        x = np.expand_dims(x, axis=0)
-        return preprocess_input(x)
-
     choice = ['Loose Silky-bent', 'Cleavers', 'Black-grass', 'Scentless Mayweed', 'Maize', 'Charlock', 'Sugar beet', 'Fat Hen', 'Small-flowered Cranesbill', 'Common wheat', 'Common Chickweed', 'Shepherd Purse']
 
     option = st.selectbox('Choice of the plant', choice)
     st.write('The chosen plant is :', option)
 
-    # Preprocesar la imagen
+    # image path
     img_path = os.path.join("Sample_images", option, "image1.jpg")
+    img_path_grad_cam = os.path.join("Grad_Cam_images", option, "grad_cam_image1.jpg")
     st.write('Path :', img_path)
-    x = preproces_image(img_path)
-
-    # Cargar el modelo
-    #model = load_model('Saved_Models/model_resize_15-15.h5')
-
-    # Cargar la lista de historias
-    #with open('Saved_Models/histories_resize_15-15.pkl', 'rb') as file:
-    #    history_list = pickle.load(file)
-
-    # Obtener la prediccion segun mi modelo
-    #class_index = np.argmax(model.predict(x))
-
-    # Obtener la ultima capa convolucional de mi modelo
-    #base_model = model.get_layer('vgg16')
-    #layer_name = 'block5_conv3'
-        
-    # Obtener la interpretacion Grad-CAM
-    #heatmap = grad_cam(base_model, x, layer_name)
 
     # Display original image
     img = image.load_img(img_path, target_size=(224, 224))
@@ -274,11 +188,9 @@ if page == pages[3] :
     st.set_option('deprecation.showPyplotGlobalUse', False)
     st.pyplot()
 
+    # Display Grad CAM image
+    img = image.load_img(img_path_grad_cam, target_size=(224, 224))
+    plt.matshow(img)
+    st.set_option('deprecation.showPyplotGlobalUse', False)
+    st.pyplot()
 
-
-    # Display heatmap
-    #plt.matshow(heatmap)
-    #st.pyplot()
-
-    # Save and diplay superimposed heatmap
-    #display_gradcam(img_path, heatmap)
