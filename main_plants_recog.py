@@ -45,10 +45,10 @@ if page == pages[2] :
                 history_list = pickle.load(file) # in CNN a history list was made
             show_plot_history_list(history_list)
         elif classifier == 'LeNet':
-            #path_histories = os.path.join(route, 'histories_lenet_200x200.pkl')
+            path_histories = os.path.join(route, 'histories_lenet_200x200.pkl')
             # Cargar la lista de historias
-            #with open(path_histories, 'rb') as file:
-            #    model_history = pickle.load(file) # in LeNet a single history was made
+            with open(path_histories, 'rb') as file:
+                model_history = pickle.load(file) # in LeNet a single history was made
             #show_accuracy_plot(model_history, 30)
             st.write('Testing')
         elif classifier == 'LeNet Balanced':
