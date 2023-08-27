@@ -15,7 +15,6 @@ import matplotlib.cm as cm
 import tensorflow as tf
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.vgg16 import preprocess_input, decode_predictions
-from IPython.display import Image, display
 
 st.title("Plant seeds classification project")
 st.sidebar.title("Table of contents")
