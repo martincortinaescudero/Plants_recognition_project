@@ -2,3 +2,8 @@ keras
 tensorflow
 matplotlib
 seaborn
+joblib
+os
+itertools
+json
+IPython
