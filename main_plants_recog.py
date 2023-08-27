@@ -49,7 +49,8 @@ if page == pages[2] :
             # Cargar la lista de historias
             with open(path_histories, 'rb') as file:
                 model_history = pickle.load(file) # in LeNet a single history was made
-            show_accuracy_plot(model_history, 30)
+            #show_accuracy_plot(model_history, 30)
+            st.write('Testing')
         elif classifier == 'LeNet Balanced':
             path_histories = os.path.join(route, 'histories_lenet_200x200_balanced.pkl')
             # Cargar la lista de historias
