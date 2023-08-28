@@ -33,11 +33,47 @@ if page == pages[2] :
     def prediction(classifier):
         route = "Saved_Models"
         if classifier == 'Random Forest':
-            st.write('Option not available')
+            loaded_cm = np.load(os.path.join(route, 'matriz_confusion_rf_classifier.npy'))
+            loaded_category_to_label = np.load(os.path.join(route, 'class_names.npy'))
+            accuracy = np.trace(loaded_cm) / np.sum(loaded_cm)
+            st.write("### Accuracy:", f"{accuracy:.2f}")
+            show_confusion_matrix(loaded_cm, loaded_category_to_label, "Random Forest")
         elif classifier == 'SVM':
-            st.write('Option not available')
+            loaded_cm = np.load(os.path.join(route, 'matriz_confusion_svm_classifier.npy'))
+            loaded_category_to_label = np.load(os.path.join(route, 'class_names.npy'))
+            accuracy = np.trace(loaded_cm) / np.sum(loaded_cm)
+            st.write("### Accuracy:", f"{accuracy:.2f}")
+            show_confusion_matrix(loaded_cm, loaded_category_to_label, "SVM")
+        elif classifier == 'SVM-PCA':
+            loaded_cm = np.load(os.path.join(route, 'matriz_confusion_svm_pca_classifier.npy'))
+            loaded_category_to_label = np.load(os.path.join(route, 'class_names.npy'))
+            accuracy = np.trace(loaded_cm) / np.sum(loaded_cm)
+            st.write("### Accuracy:", f"{accuracy:.2f}")
+            show_confusion_matrix(loaded_cm, loaded_category_to_label, "SVM-PCA")
+        elif classifier == 'SVM-Balanced':
+            loaded_cm = np.load(os.path.join(route, 'matriz_confusion_svm_balanced_classifier.npy'))
+            loaded_category_to_label = np.load(os.path.join(route, 'class_names.npy'))
+            accuracy = np.trace(loaded_cm) / np.sum(loaded_cm)
+            st.write("### Accuracy:", f"{accuracy:.2f}")
+            show_confusion_matrix(loaded_cm, loaded_category_to_label, "SVM Balanced")
         elif classifier == 'KNN':
-            st.write('Option not available')
+            loaded_cm = np.load(os.path.join(route, 'matriz_confusion_knn_classifier.npy'))
+            loaded_category_to_label = np.load(os.path.join(route, 'class_names.npy'))
+            accuracy = np.trace(loaded_cm) / np.sum(loaded_cm)
+            st.write("### Accuracy:", f"{accuracy:.2f}")
+            show_confusion_matrix(loaded_cm, loaded_category_to_label, "KNN")
+        elif classifier == 'KNN-PCA':
+            loaded_cm = np.load(os.path.join(route, 'matriz_confusion_knn_pca_classifier.npy'))
+            loaded_category_to_label = np.load(os.path.join(route, 'class_names.npy'))
+            accuracy = np.trace(loaded_cm) / np.sum(loaded_cm)
+            st.write("### Accuracy:", f"{accuracy:.2f}")
+            show_confusion_matrix(loaded_cm, loaded_category_to_label, "KNN-PCA")
+        elif classifier == 'KNN':
+            loaded_cm = np.load(os.path.join(route, 'matriz_confusion_knn_classifier.npy'))
+            loaded_category_to_label = np.load(os.path.join(route, 'class_names.npy'))
+            accuracy = np.trace(loaded_cm) / np.sum(loaded_cm)
+            st.write("### Accuracy:", f"{accuracy:.2f}")
+            show_confusion_matrix(loaded_cm, loaded_category_to_label, "KNN")
         elif classifier == 'A simple CNN':
             path_histories = os.path.join(route, 'histories_simple_cnn_224x224.pkl')
             # Cargar la lista de historias
@@ -139,14 +175,14 @@ if page == pages[2] :
         # Utilizar Streamlit para mostrar la figura
         st.pyplot(fig)
 
-    def show_confusion_matrix(cm, classes):
+    def show_confusion_matrix(cm, classes, title):
         # Normalize the confusion matrix to show percentages
         cm_percent = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis] * 100
 
         plt.figure()
 
         plt.imshow(cm_percent, interpolation='nearest', cmap='Blues')
-        plt.title("Confusion Matrix")
+        plt.title("Normalized Confusion Matrix for " + title)
         plt.colorbar()
         tick_marks = np.arange(len(classes))
         plt.xticks(tick_marks, classes, rotation=90)
@@ -164,7 +200,7 @@ if page == pages[2] :
         st.pyplot()
 
 
-    choice = ['Random Forest', 'SVM', 'KNN', 'A simple CNN', 'LeNet', 'LeNet Balanced', 'VGG16', 'Fastai', 'VGG16 + SVM']
+    choice = ['Random Forest', 'SVM', "SVM-PCA", "SVM-Balanced", 'KNN', "KNN-PCA", 'A simple CNN', 'LeNet', 'LeNet Balanced', 'VGG16', 'Fastai', 'VGG16 + SVM']
     option = st.selectbox('Choice of the model', choice)
     st.write('The chosen model is :', option)
     prediction(option)
