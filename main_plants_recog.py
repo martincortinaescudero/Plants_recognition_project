@@ -19,7 +19,7 @@ import io
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import load_model
 import h5py
-from sklearn.metrics import confusion_matrix
+#from sklearn.metrics import confusion_matrix
 
 st.title("Plant seeds classification project")
 st.sidebar.title("Table of contents")
@@ -105,25 +105,11 @@ if page == pages[2] :
             classes = list(loaded_category_to_label.keys())
             show_confusion_matrix(loaded_cm, classes, "LeNET")
         elif classifier == 'VGG16':
-            def make_predictions(test_images_route, model):
-                # Volvemos a definir el test_generator con shuffle=False.
-                # Esto desactiva la mezcla aleatoria de los datos en cada época durante el proceso de evaluación lo cual es útil para asegurarte
-                # de que las predicciones coincidan con las etiquetas en el orden correcto.
-                batch_size = 64
-                test_data_generator = ImageDataGenerator(
-                    preprocessing_function = preprocess_input)
-                test_generator = test_data_generator.flow_from_directory(directory=test_images_route,
-                                                                        class_mode ="sparse",
-                                                                        target_size = (224 , 224),
-                                                                        batch_size = batch_size,
-                                                                        shuffle=False)
-                # Obtener las etiquetas reales del conjunto de prueba
-                y_true = test_generator.classes
-                # Realizar predicciones en el conjunto de prueba
-                predictions = model.predict(test_generator, steps=len(test_generator), verbose=1)
-                # Convertir las predicciones continuas en clases
-                predicted_classes = np.argmax(predictions, axis=1)
-                return y_true, predicted_classes, test_generator
+            def preproces_image(img_path):
+                img = image.load_img(img_path, target_size=(224, 224))
+                x = image.img_to_array(img)
+                x = np.expand_dims(x, axis=0)
+                return preprocess_input(x)
             # model was splitted to upload in github
             part_filenames = ['Saved_Models/model_part01', 'Saved_Models/model_part02', 'Saved_Models/model_part03', 'Saved_Models/model_part04']
             # Crear una lista para almacenar los contenidos de las partes
@@ -139,13 +125,32 @@ if page == pages[2] :
                 with h5py.File(in_memory_file, 'r') as h5_file:
                     # Cargar el modelo desde el archivo HDF5
                     model = load_model(h5_file)
-                    y_true_vgg16, predicted_classes_vgg16, test_generator_vgg16 = make_predictions("Sample_images", model)
-                    cm = confusion_matrix(y_true_vgg16, predicted_classes_vgg16)
-                    # Get class names from test_generator class indices
-                    class_names = list(test_generator_vgg16.class_indices.keys())
-                    accuracy = np.trace(cm) / np.sum(cm)
-                    st.write("### Accuracy:", f"{accuracy:.2f}")
-                    show_confusion_matrix(cm, class_names, "VGG16")
+            choice = ['Loose Silky-bent', 'Cleavers', 'Black-grass', 'Scentless Mayweed', 'Maize', 'Charlock', 'Sugar beet', 'Fat Hen', 'Small-flowered Cranesbill', 'Common wheat', 'Common Chickweed', 'Shepherd Purse']
+            option = st.selectbox('Choice of the plant', choice)
+            st.write('The chosen plant is :', option)
+
+            # image path
+            img_path = os.path.join("Sample_images", option, "image1.jpg")
+            # Display original image
+            img = image.load_img(img_path, target_size=(224, 224))
+            plt.matshow(img)
+            st.set_option('deprecation.showPyplotGlobalUse', False)
+            st.pyplot()
+            x = preproces_image(img_path)
+            # Obtener la prediccion segun mi modelo
+            class_index = np.argmax(model.predict(x))
+            batch_size = 64
+            test_data_generator = ImageDataGenerator(preprocessing_function = preprocess_input)
+            test_generator = test_data_generator.flow_from_directory(directory="Sample_images",
+                                                                    class_mode ="sparse",
+                                                                    target_size = (224 , 224),
+                                                                    batch_size = batch_size,
+                                                                    shuffle=False)
+            class_names = list(test_generator.class_indices.keys())
+            #with open(os.path.join(route, 'category_to_label.json'), 'r') as json_file:
+            #    loaded_category_to_label = json.load(json_file)
+            #classes = list(loaded_category_to_label.keys())
+            st.write('Prediction :', class_names[class_index])
         elif classifier == 'Fastai':
             st.write('Option not available')
         elif classifier == 'VGG16 + SVM':
