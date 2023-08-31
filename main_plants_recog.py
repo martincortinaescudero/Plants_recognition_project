@@ -15,6 +15,11 @@ import matplotlib.cm as cm
 import tensorflow as tf
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.vgg16 import preprocess_input, decode_predictions
+import io
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.models import load_model
+import h5py
+from sklearn.metrics import confusion_matrix
 
 st.title("Plant seeds classification project")
 st.sidebar.title("Table of contents")
@@ -29,7 +34,7 @@ if page == pages[1] :
 
 if page == pages[2] : 
     st.write("### Modelling")
-
+    st.set_option('deprecation.showPyplotGlobalUse', False)
     def prediction(classifier):
         route = "Saved_Models"
         if classifier == 'Random Forest':
@@ -98,10 +103,49 @@ if page == pages[2] :
             show_accuracy_plot(model_history, 30)
             #classes
             classes = list(loaded_category_to_label.keys())
-            st.set_option('deprecation.showPyplotGlobalUse', False)
-            show_confusion_matrix(loaded_cm, classes)
+            show_confusion_matrix(loaded_cm, classes, "LeNET")
         elif classifier == 'VGG16':
-            st.write('Option not available')
+            def make_predictions(test_images_route, model):
+                # Volvemos a definir el test_generator con shuffle=False.
+                # Esto desactiva la mezcla aleatoria de los datos en cada época durante el proceso de evaluación lo cual es útil para asegurarte
+                # de que las predicciones coincidan con las etiquetas en el orden correcto.
+                batch_size = 64
+                test_data_generator = ImageDataGenerator(
+                    preprocessing_function = preprocess_input)
+                test_generator = test_data_generator.flow_from_directory(directory=test_images_route,
+                                                                        class_mode ="sparse",
+                                                                        target_size = (224 , 224),
+                                                                        batch_size = batch_size,
+                                                                        shuffle=False)
+                # Obtener las etiquetas reales del conjunto de prueba
+                y_true = test_generator.classes
+                # Realizar predicciones en el conjunto de prueba
+                predictions = model.predict(test_generator, steps=len(test_generator), verbose=1)
+                # Convertir las predicciones continuas en clases
+                predicted_classes = np.argmax(predictions, axis=1)
+                return y_true, predicted_classes, test_generator
+            # model was splitted to upload in github
+            part_filenames = ['Saved_Models/model_part01', 'Saved_Models/model_part02', 'Saved_Models/model_part03', 'Saved_Models/model_part04']
+            # Crear una lista para almacenar los contenidos de las partes
+            part_contents = []
+            # Leer cada parte y almacenar su contenido en la lista
+            for part_filename in part_filenames:
+                with open(part_filename, 'rb') as part_file:
+                    part_contents.append(part_file.read())
+            # Combinar las partes en un solo contenido
+            full_file_data = b''.join(part_contents)
+            # Abre el archivo h5 directamente desde el contenido en memoria
+            with io.BytesIO(full_file_data) as in_memory_file:
+                with h5py.File(in_memory_file, 'r') as h5_file:
+                    # Cargar el modelo desde el archivo HDF5
+                    model = load_model(h5_file)
+                    y_true_vgg16, predicted_classes_vgg16, test_generator_vgg16 = make_predictions("Sample_images", model)
+                    cm = confusion_matrix(y_true_vgg16, predicted_classes_vgg16)
+                    # Get class names from test_generator class indices
+                    class_names = list(test_generator_vgg16.class_indices.keys())
+                    accuracy = np.trace(cm) / np.sum(cm)
+                    st.write("### Accuracy:", f"{accuracy:.2f}")
+                    show_confusion_matrix(cm, class_names, "VGG16")
         elif classifier == 'Fastai':
             st.write('Option not available')
         elif classifier == 'VGG16 + SVM':
