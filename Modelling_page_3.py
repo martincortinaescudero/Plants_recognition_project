@@ -59,7 +59,7 @@ def main():
             st.write('Prediction :', loaded_category_to_label[class_index])
             show_confusion_matrix('matriz_confusion_vgg16.npy', 'class_names_vgg16.npy', "VGG16")
         elif classifier == 'Fastai':
-            file_model_fastai = '../GITHUB_LF/model_fastai.pkl'
+            file_model_fastai = 'Saved_Models/model_fastai.pkl'
             learner_load = load_learner(file_model_fastai)
             option = st.selectbox('Choice of the plant', choice_plant)
             st.write('The chosen plant is :', option)
