@@ -10,7 +10,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import joblib
 import os
-import pickle
 import matplotlib.pyplot as plt
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.models import load_model
@@ -41,6 +40,7 @@ def main():
             show_accuracy_loss_plot(history_list)
             show_confusion_matrix_from_data(loaded_cm, classes, "LeNET")
         elif classifier == 'VGG16':
+            from tensorflow.keras.models import load_model
             file_model_vgg16 = '../GITHUB_LF/model_vgg16.h5'
             model = load_model(file_model_vgg16, compile=False)
             option = st.selectbox('Choice of the plant', choice_plant)
@@ -72,6 +72,7 @@ def main():
             predecir_imagen(img_path, learner_load)
             show_confusion_matrix('matriz_confusion_fastai.npy', 'class_names_fastai.npy', "Fastai")
         elif classifier == 'VGG16 + SVM':
+            from tensorflow.keras.models import load_model
             file_model_vgg16_svm_intermediate_layer = '../GITHUB_LF/intermediate_layer_model.h5'
             file_model_vgg16_svm = '../GITHUB_LF/vgg16+svm_classifier.pkl'
             model_vgg16_svm_intermediate_layer = load_model(file_model_vgg16_svm_intermediate_layer, compile=False)
