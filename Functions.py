@@ -14,6 +14,7 @@ import pickle
 from tensorflow.keras.models import load_model
 import h5py
 import joblib
+import random
 
 def load_fastai_model():
     #import pathlib # only in windows
@@ -27,15 +28,21 @@ def load_fastai_model():
 def select_plant_for_prediction():
     choice_plant = ['Loose Silky-bent', 'Cleavers', 'Black-grass', 'Scentless Mayweed', 'Maize', 'Charlock', 'Sugar beet', 'Fat Hen', 'Small-flowered Cranesbill', 'Common wheat', 'Common Chickweed', 'Shepherd Purse']
     option = st.selectbox('Choice of the plant', choice_plant)
-    st.write('The chosen plant is :', option)
-    # image path
-    img_path = os.path.join("Test_original", option, "image1.jpg")
-    # Display original image
-    img = image.load_img(img_path, target_size=(224, 224))
-    plt.matshow(img)
-    st.set_option('deprecation.showPyplotGlobalUse', False)
-    st.pyplot()
-    return img_path
+    st.write('The chosen plant is:', option)
+    # Get a list of all image files in the selected directory
+    plant_directory = os.path.join("Test_original", option)
+    image_files = [f for f in os.listdir(plant_directory) if f.endswith('.jpg')]
+    # Randomly select an image from the directory
+    if image_files:
+        random_image = random.choice(image_files)
+        img_path = os.path.join(plant_directory, random_image)
+        # Display the randomly selected image
+        img = image.load_img(img_path, target_size=(224, 224))
+        st.image(img, use_column_width=False)
+        return img_path
+    else:
+        st.write('No images found in the selected directory.')
+        return None
 
 def load_vgg16():
         # Lista de nombres de archivos de las partes
@@ -87,11 +94,7 @@ def predecir_imagen(ruta_de_la_imagen, model, model_type, route, file_name):
         features_of_image = model[0].predict(preproces_image(ruta_de_la_imagen))
         prediction = model[1].predict(features_of_image)
         loaded_category_to_label = np.load(os.path.join(route, 'class_names_VGG16+SVM.npy'))
-        st.write('Prediction :', loaded_category_to_label[prediction-1])
-
-def show_plot_history_list(history_list):
-    # Crear una figura y ejes para el gráfico
-    fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(14, 6))
+        st.write('Prediction :', loaded_category_to_label[prediction-1][0])
 
 def show_accuracy_loss_plot(history_list):
     # Crear una figura y ejes para el gráfico
@@ -227,7 +230,7 @@ def show_stats_plots(df, plot_type):
     else:
         st.write("Plot type not recognized. Please choose from 'image_counts', 'max_size', 'min_size', 'average_sizes' or rgb_histogram.")
 
-# Función para cargar imágenes y mostrar un conjunto de 5 imágenes aleatorias por directorio en Streamlit
+# Function to load images and display a set of 5 random images per directory in Streamlit
 def load_and_show_images(path, size):
     # Iterate over the images in the directory
     for dirname, _, filenames in os.walk(path):
@@ -252,7 +255,7 @@ def load_and_show_images(path, size):
                 # Break the loop to only show 5 images per directory
                 break
 
-# Función para mostrar el mosaico de imágenes
+# Function to display the image mosaic
 def show_image_mosaic(subdirectory_name, images):
     num_rows = 1
     num_cols = len(images)
@@ -260,9 +263,9 @@ def show_image_mosaic(subdirectory_name, images):
     fig.tight_layout()
     for j, image in enumerate(images):
         ax = axes[j] if num_cols > 1 else axes
-        ax.imshow(image, extent=[0, 1, 0, 1])  # Ajusta el tamaño de la imagen
+        ax.imshow(image, extent=[0, 1, 0, 1])  # Adjust the image size
         ax.axis('off')
-    # Ajusta el tamaño de la figura
+    # Adjust the size of the figure
     fig.subplots_adjust(wspace=0.05)
     st.write(f"{subdirectory_name}")
     st.pyplot(fig)

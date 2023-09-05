@@ -1,5 +1,4 @@
 import streamlit as st
-from Functions import preproces_image
 from Functions import predecir_imagen
 from Functions import show_confusion_matrix
 from Functions import show_confusion_matrix_from_data
