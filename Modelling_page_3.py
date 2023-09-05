@@ -5,7 +5,8 @@ from Functions import show_confusion_matrix
 from Functions import show_confusion_matrix_from_data
 from Functions import show_accuracy_loss_plot
 from Functions import load_history_classes_cm
-from Functions import set_posix_windows
+from Functions import select_plant_for_prediction
+from Functions import load_fastai_model
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,7 +16,6 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.models import load_model
 from fastai.vision.all import *
-import pathlib
 #import pathlib
 #temp = pathlib.PosixPath
 #pathlib.PosixPath = pathlib.WindowsPath
@@ -59,17 +59,16 @@ def main():
             with io.BytesIO(full_file_data) as in_memory_file:
                 with h5py.File(in_memory_file, 'r') as h5_file:
                     model = load_model(h5_file)
-            #file_model_vgg16 = '../GITHUB_LF/model_vgg16.h5'
-            #model = load_model(file_model_vgg16, compile=False)
-            option = st.selectbox('Choice of the plant', choice_plant)
-            st.write('The chosen plant is :', option)
-            # image path
-            img_path = os.path.join("Sample_images", option, "image1.jpg")
-            # Display original image
-            img = image.load_img(img_path, target_size=(224, 224))
-            plt.matshow(img)
-            st.set_option('deprecation.showPyplotGlobalUse', False)
-            st.pyplot()
+            #option = st.selectbox('Choice of the plant', choice_plant)
+            #st.write('The chosen plant is :', option)
+            ## image path
+            #img_path = os.path.join("Sample_images", option, "image1.jpg")
+            ## Display original image
+            #img = image.load_img(img_path, target_size=(224, 224))
+            #plt.matshow(img)
+            #st.set_option('deprecation.showPyplotGlobalUse', False)
+            #st.pyplot()
+            img_path = select_plant_for_prediction()
             x = preproces_image(img_path)
             # Obtener la prediccion segun mi modelo
             class_index = np.argmax(model.predict(x))
@@ -78,19 +77,18 @@ def main():
             show_confusion_matrix('matriz_confusion_vgg16.npy', 'class_names_vgg16.npy', "VGG16")
         elif classifier == 'Fastai':
             # TODO use load_history_classes_cm / show history /organize code with a general funtion predict / make it locally work (path problem in load_learner)
-            file_model_fastai = pathlib.Path('Saved_Models/model_fastai.pkl')
-            with set_posix_windows():
-                learner_load = load_learner(file_model_fastai)
             #file_model_fastai = 'Saved_Models/model_fastai.pkl'
             #learner_load = load_learner(file_model_fastai)
-            option = st.selectbox('Choice of the plant', choice_plant)
-            st.write('The chosen plant is :', option)
-            img_path = os.path.join("Test_original", option, "image1.jpg")
-            # Display original image
-            img = image.load_img(img_path, target_size=(224, 224))
-            plt.matshow(img)
-            st.set_option('deprecation.showPyplotGlobalUse', False)
-            st.pyplot()
+            learner_load = load_fastai_model()
+            #option = st.selectbox('Choice of the plant', choice_plant)
+            #st.write('The chosen plant is :', option)
+            #img_path = os.path.join("Test_original", option, "image1.jpg")
+            ## Display original image
+            #img = image.load_img(img_path, target_size=(224, 224))
+            #plt.matshow(img)
+            #st.set_option('deprecation.showPyplotGlobalUse', False)
+            #st.pyplot()
+            img_path = select_plant_for_prediction()
             predecir_imagen(img_path, learner_load)
             show_confusion_matrix('matriz_confusion_fastai.npy', 'class_names_fastai.npy', "Fastai")
         elif classifier == 'VGG16 + SVM':
@@ -100,16 +98,17 @@ def main():
             file_model_vgg16_svm = 'Saved_Models/vgg16+svm_classifier.pkl'
             model_vgg16_svm_intermediate_layer = load_model(file_model_vgg16_svm_intermediate_layer, compile=False)
             model_vgg16_svm = joblib.load(file_model_vgg16_svm)
-            option = st.selectbox('Choice of the plant', choice_plant)
-            st.write('The chosen plant is :', option)
-            # image path
-            img_path = os.path.join("Sample_images", option, "image1.jpg")
-            # Display original image
-            img = image.load_img(img_path, target_size=(224, 224))
-            plt.matshow(img)
-            st.set_option('deprecation.showPyplotGlobalUse', False)
-            st.pyplot()
+            #option = st.selectbox('Choice of the plant', choice_plant)
+            #st.write('The chosen plant is :', option)
+            ## image path
+            #img_path = os.path.join("Sample_images", option, "image1.jpg")
+            ## Display original image
+            #img = image.load_img(img_path, target_size=(224, 224))
+            #plt.matshow(img)
+            #st.set_option('deprecation.showPyplotGlobalUse', False)
+            #st.pyplot()
             # Obtener la prediccion segun mi modelo
+            img_path = select_plant_for_prediction()
             features_of_image = model_vgg16_svm_intermediate_layer.predict(preproces_image(img_path))
             prediction = model_vgg16_svm.predict(features_of_image)
             loaded_category_to_label = np.load(os.path.join(route, 'class_names_VGG16+SVM.npy'))

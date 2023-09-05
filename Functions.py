@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import itertools
 from tensorflow.keras.preprocessing import image
-from tensorflow.keras.applications.vgg16 import preprocess_input#, decode_predictions
+from tensorflow.keras.applications.vgg16 import preprocess_input
 from fastai.vision.all import *
 #import pathlib
 #temp = pathlib.PosixPath
@@ -14,17 +14,28 @@ from PIL import Image
 import json
 import os
 import pickle
-from contextlib import contextmanager
-import pathlib
 
-@contextmanager
-def set_posix_windows():
-    posix_backup = pathlib.PosixPath
-    try:
-        pathlib.PosixPath = pathlib.WindowsPath
-        yield
-    finally:
-        pathlib.PosixPath = posix_backup
+def select_plant_for_prediction():
+    choice_plant = ['Loose Silky-bent', 'Cleavers', 'Black-grass', 'Scentless Mayweed', 'Maize', 'Charlock', 'Sugar beet', 'Fat Hen', 'Small-flowered Cranesbill', 'Common wheat', 'Common Chickweed', 'Shepherd Purse']
+    option = st.selectbox('Choice of the plant', choice_plant)
+    st.write('The chosen plant is :', option)
+    # image path
+    img_path = os.path.join("Test_original", option, "image1.jpg")
+    # Display original image
+    img = image.load_img(img_path, target_size=(224, 224))
+    plt.matshow(img)
+    st.set_option('deprecation.showPyplotGlobalUse', False)
+    st.pyplot()
+    return img_path
+
+def load_fastai_model():
+    #import pathlib # only in windows
+    #temp = pathlib.PosixPath # only in windows
+    #pathlib.PosixPath = pathlib.WindowsPath # only in windows
+    file_model_fastai = 'Saved_Models/model_fastai.pkl'
+    learner_load = load_learner(file_model_fastai)
+    #pathlib.PosixPath = temp # only in windows
+    return learner_load
 
 def preproces_image(img_path):
     img = image.load_img(img_path, target_size=(224, 224))
