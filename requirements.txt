@@ -4,4 +4,4 @@ matplotlib
 seaborn
 joblib
 fastai
-PIL
+pillow==8.2.0
