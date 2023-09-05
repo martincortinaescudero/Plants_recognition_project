@@ -5,6 +5,7 @@ from Functions import show_confusion_matrix
 from Functions import show_confusion_matrix_from_data
 from Functions import show_accuracy_loss_plot
 from Functions import load_history_classes_cm
+from Functions import set_posix_windows
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,6 +15,7 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.models import load_model
 from fastai.vision.all import *
+import pathlib
 #import pathlib
 #temp = pathlib.PosixPath
 #pathlib.PosixPath = pathlib.WindowsPath
@@ -75,9 +77,12 @@ def main():
             st.write('Prediction :', loaded_category_to_label[class_index])
             show_confusion_matrix('matriz_confusion_vgg16.npy', 'class_names_vgg16.npy', "VGG16")
         elif classifier == 'Fastai':
-            # TODO use load_history_classes_cm / show history /organize code with a general funtion predict / make it locally work (path problem)
-            file_model_fastai = 'Saved_Models/model_fastai.pkl'
-            learner_load = load_learner(file_model_fastai)
+            # TODO use load_history_classes_cm / show history /organize code with a general funtion predict / make it locally work (path problem in load_learner)
+            file_model_fastai = pathlib.Path('Saved_Models/model_fastai.pkl')
+            with set_posix_windows():
+                learner_load = load_learner(file_model_fastai)
+            #file_model_fastai = 'Saved_Models/model_fastai.pkl'
+            #learner_load = load_learner(file_model_fastai)
             option = st.selectbox('Choice of the plant', choice_plant)
             st.write('The chosen plant is :', option)
             img_path = os.path.join("Test_original", option, "image1.jpg")
@@ -89,7 +94,7 @@ def main():
             predecir_imagen(img_path, learner_load)
             show_confusion_matrix('matriz_confusion_fastai.npy', 'class_names_fastai.npy', "Fastai")
         elif classifier == 'VGG16 + SVM':
-            # TODO use load_history_classes_cm / organize code with a general funtion predict / make it locally work (path problem)
+            # TODO use load_history_classes_cm / organize code with a general funtion predict
             from tensorflow.keras.models import load_model
             file_model_vgg16_svm_intermediate_layer = 'Saved_Models/intermediate_layer_model.h5'
             file_model_vgg16_svm = 'Saved_Models/vgg16+svm_classifier.pkl'

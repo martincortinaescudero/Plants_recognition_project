@@ -14,6 +14,17 @@ from PIL import Image
 import json
 import os
 import pickle
+from contextlib import contextmanager
+import pathlib
+
+@contextmanager
+def set_posix_windows():
+    posix_backup = pathlib.PosixPath
+    try:
+        pathlib.PosixPath = pathlib.WindowsPath
+        yield
+    finally:
+        pathlib.PosixPath = posix_backup
 
 def preproces_image(img_path):
     img = image.load_img(img_path, target_size=(224, 224))
