@@ -41,8 +41,23 @@ def main():
             show_confusion_matrix_from_data(loaded_cm, classes, "LeNET")
         elif classifier == 'VGG16':
             from tensorflow.keras.models import load_model
-            file_model_vgg16 = '../GITHUB_LF/model_vgg16.h5'
-            model = load_model(file_model_vgg16, compile=False)
+            import h5py
+            # Lista de nombres de archivos de las partes
+            part_filenames = ['Saved_Models/model_part01', 'Saved_Models/model_part02', 'Saved_Models/model_part03', 'Saved_Models/model_part04']
+            # Crear una lista para almacenar los contenidos de las partes
+            part_contents = []
+            # Leer cada parte y almacenar su contenido en la lista
+            for part_filename in part_filenames:
+                with open(part_filename, 'rb') as part_file:
+                    part_contents.append(part_file.read())
+            # Combinar las partes en un solo contenido
+            full_file_data = b''.join(part_contents)
+            # Abre el archivo h5 directamente desde el contenido en memoria
+            with io.BytesIO(full_file_data) as in_memory_file:
+                with h5py.File(in_memory_file, 'r') as h5_file:
+                    model = load_model(h5_file)
+            #file_model_vgg16 = '../GITHUB_LF/model_vgg16.h5'
+            #model = load_model(file_model_vgg16, compile=False)
             option = st.selectbox('Choice of the plant', choice_plant)
             st.write('The chosen plant is :', option)
             # image path
@@ -58,6 +73,9 @@ def main():
             loaded_category_to_label = np.load(os.path.join(route, 'class_names_vgg16.npy'))
             st.write('Prediction :', loaded_category_to_label[class_index])
             show_confusion_matrix('matriz_confusion_vgg16.npy', 'class_names_vgg16.npy', "VGG16")
+
+
+
         elif classifier == 'Fastai':
             file_model_fastai = 'Saved_Models/model_fastai.pkl'
             learner_load = load_learner(file_model_fastai)
