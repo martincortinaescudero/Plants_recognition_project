@@ -3,8 +3,7 @@ from Functions import preproces_image
 from Functions import predecir_imagen
 from Functions import show_confusion_matrix
 from Functions import show_confusion_matrix_from_data
-from Functions import show_accuracy_loss_plot_with_model_history
-from Functions import show_accuracy_loss_plot_with_history_list
+from Functions import show_accuracy_loss_plot
 from Functions import load_history_classes_cm
 import streamlit as st
 import numpy as np
@@ -35,11 +34,11 @@ def main():
             show_confusion_matrix('matriz_confusion_knn_pca_classifier.npy', 'class_names.npy', "KNN-PCA")
         elif classifier == 'A simple CNN':
             history_list, loaded_cm, classes = load_history_classes_cm(route, 'histories_simple_cnn_224x224.pkl', 'matriz_confusion_simple_cnn_224x224.npy', 'class_names_simple_cnn_224x224.npy')
-            show_accuracy_loss_plot_with_history_list(history_list)
+            show_accuracy_loss_plot(history_list)
             show_confusion_matrix_from_data(loaded_cm, classes, "A simple CNN")
         elif classifier == 'LeNet':
-            model_history, loaded_cm, classes = load_history_classes_cm(route, 'histories_lenet_200x200_balanced.pkl', 'matriz_confusion_lenet_balanced.npy', 'category_to_label.json')
-            show_accuracy_loss_plot_with_model_history(model_history, 30)
+            history_list, loaded_cm, classes = load_history_classes_cm(route, 'histories_lenet_200x200_balanced.pkl', 'matriz_confusion_lenet_balanced.npy', 'category_to_label.json')
+            show_accuracy_loss_plot(history_list)
             show_confusion_matrix_from_data(loaded_cm, classes, "LeNET")
         elif classifier == 'VGG16':
             file_model_vgg16 = '../GITHUB_LF/model_vgg16.h5'

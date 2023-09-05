@@ -34,56 +34,7 @@ def show_plot_history_list(history_list):
     # Crear una figura y ejes para el gráfico
     fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(14, 6))
 
-def show_accuracy_loss_plot_with_model_history(model_history, epochs):
-    # Crear una figura y ejes para el gráfico
-    fig, ax1 = plt.subplots(figsize=(10, 6))
-    # Ejes para la precisión
-    ax1.set_xlabel('Epochs')
-    ax1.set_ylabel('Accuracy', color='blue')
-    ax1.plot(np.arange(1, epochs + 1, 1), model_history.history['accuracy'], label='Training Accuracy', color='blue')
-    ax1.plot(np.arange(1, epochs + 1, 1), model_history.history['val_accuracy'], label='Validation Accuracy', color='red')
-    ax1.tick_params(axis='y', labelcolor='blue')
-    ax1.legend(loc='upper left')
-    # Crear un segundo eje y eje para la pérdida
-    ax2 = ax1.twinx()
-    ax2.set_ylabel('Loss', color='green')
-    ax2.plot(np.arange(1, epochs + 1, 1), model_history.history['loss'], label='Training Loss', color='green')
-    ax2.plot(np.arange(1, epochs + 1, 1), model_history.history['val_loss'], label='Validation Loss', color='orange')
-    ax2.tick_params(axis='y', labelcolor='green')
-    ax2.legend(loc='upper right')
-    # Utilizar Streamlit para mostrar la figura
-    st.pyplot(fig)
-
-def show_accuracy_loss_plot_with_history_list_(history_list):
-    # Crear una figura y ejes para el gráfico
-    fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(14, 6))
-    history_acc = []
-    history_val_acc = []
-    history_loss = []
-    history_val_loss = []
-    # Recopilar las precisiones (accuracy) y pérdidas (loss) de todas las historias en history_list
-    for history in history_list:
-        history_acc.extend(history['accuracy'])
-        history_val_acc.extend(history['val_accuracy'])
-        history_loss.extend(history['loss'])
-        history_val_loss.extend(history['val_loss'])
-    # Graficar la precisión (accuracy) en función de las épocas
-    axes[0].plot(history_acc, label='Train Accuracy')
-    axes[0].plot(history_val_acc, label='Validation Accuracy')
-    axes[0].set_title('Accuracy')
-    axes[0].set_xlabel('Epoch')
-    axes[0].set_ylabel('Accuracy')
-    axes[0].legend()
-    # Graficar la pérdida (loss) en función de las épocas
-    axes[1].plot(history_loss, label='Train Loss')
-    axes[1].plot(history_val_loss, label='Validation Loss')
-    axes[1].set_title('Loss')
-    axes[1].set_xlabel('Epoch')
-    axes[1].set_ylabel('Loss')
-    axes[1].legend()
-    st.pyplot(fig)
-
-def show_accuracy_loss_plot_with_history_list(history_list):
+def show_accuracy_loss_plot(history_list):
     # Crear una figura y ejes para el gráfico
     fig, ax1 = plt.subplots(figsize=(10, 6))
     history_acc = []
