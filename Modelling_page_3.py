@@ -1,10 +1,11 @@
 import streamlit as st
 from Functions import preproces_image
 from Functions import predecir_imagen
-from Functions import show_plot_history_list
 from Functions import show_confusion_matrix
-from Functions import show_accuracy_plot
-#
+from Functions import show_confusion_matrix_from_data
+from Functions import show_accuracy_loss_plot_with_model_history
+from Functions import show_accuracy_loss_plot_with_history_list
+from Functions import load_history_classes_cm
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,7 +13,6 @@ import joblib
 import os
 import pickle
 import matplotlib.pyplot as plt
-import json
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.models import load_model
 from fastai.vision.all import *
@@ -34,31 +34,13 @@ def main():
         elif classifier == 'KNN-PCA':
             show_confusion_matrix('matriz_confusion_knn_pca_classifier.npy', 'class_names.npy', "KNN-PCA")
         elif classifier == 'A simple CNN':
-            path_histories = os.path.join(route, 'histories_simple_cnn_224x224.pkl')
-            # Cargar la lista de historias
-            with open(path_histories, 'rb') as file:
-                history_list = pickle.load(file) # in CNN a history list was made
-            show_plot_history_list(history_list)
+            history_list, loaded_cm, classes = load_history_classes_cm(route, 'histories_simple_cnn_224x224.pkl', 'matriz_confusion_simple_cnn_224x224.npy', 'class_names_simple_cnn_224x224.npy')
+            show_accuracy_loss_plot_with_history_list(history_list)
+            show_confusion_matrix_from_data(loaded_cm, classes, "A simple CNN")
         elif classifier == 'LeNet':
-            path_histories = os.path.join(route, 'histories_lenet_200x200.pkl')
-            # Cargar la lista de historias
-            with open(path_histories, 'rb') as file:
-                model_history = pickle.load(file) # in LeNet a single history was made
-            #show_accuracy_plot(model_history, 30)
-            st.write('Testing')
-        elif classifier == 'LeNet Balanced':
-            path_histories = os.path.join(route, 'histories_lenet_200x200_balanced.pkl')
-            # Cargar la lista de historias
-            with open(path_histories, 'rb') as file:
-                model_history = pickle.load(file) # in LeNet a single history was made
-            loaded_cm = np.load(os.path.join(route, 'matriz_confusion.npy'))
-            with open(os.path.join(route, 'category_to_label.json'), 'r') as json_file:
-                loaded_category_to_label = json.load(json_file)
-            show_accuracy_plot(model_history, 30)
-            #classes
-            classes = list(loaded_category_to_label.keys())
-            #show_confusion_matrix(loaded_cm, classes, "LeNET")
-            show_confusion_matrix('matriz_confusion.npy', 'category_to_label.json', "LeNET")
+            model_history, loaded_cm, classes = load_history_classes_cm(route, 'histories_lenet_200x200_balanced.pkl', 'matriz_confusion_lenet_balanced.npy', 'category_to_label.json')
+            show_accuracy_loss_plot_with_model_history(model_history, 30)
+            show_confusion_matrix_from_data(loaded_cm, classes, "LeNET")
         elif classifier == 'VGG16':
             file_model_vgg16 = '../GITHUB_LF/model_vgg16.h5'
             model = load_model(file_model_vgg16, compile=False)
@@ -111,7 +93,7 @@ def main():
             st.write('Prediction :', loaded_category_to_label[prediction-1])
             show_confusion_matrix('matriz_confusion_VGG16+SVM.npy', 'class_names_VGG16+SVM.npy', "VGG16+SVM")
 
-    choice = ['Random Forest', 'SVM', "KNN-PCA", 'A simple CNN', 'LeNet', 'LeNet Balanced', 'VGG16', 'Fastai', 'VGG16 + SVM']
+    choice = ['Random Forest', 'SVM', "KNN-PCA", 'A simple CNN', 'LeNet', 'VGG16', 'Fastai', 'VGG16 + SVM']
     option = st.selectbox('Choice of the model', choice)
     st.write('The chosen model is :', option)
     prediction(option)
