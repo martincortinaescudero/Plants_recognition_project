@@ -40,6 +40,7 @@ def main():
             show_accuracy_loss_plot(history_list)
             show_confusion_matrix_from_data(loaded_cm, classes, "LeNET")
         elif classifier == 'VGG16':
+            # TODO use load_history_classes_cm / show history /organize code with a general funtion predict
             from tensorflow.keras.models import load_model
             import h5py
             # Lista de nombres de archivos de las partes
@@ -73,10 +74,8 @@ def main():
             loaded_category_to_label = np.load(os.path.join(route, 'class_names_vgg16.npy'))
             st.write('Prediction :', loaded_category_to_label[class_index])
             show_confusion_matrix('matriz_confusion_vgg16.npy', 'class_names_vgg16.npy', "VGG16")
-
-
-
         elif classifier == 'Fastai':
+            # TODO use load_history_classes_cm / show history /organize code with a general funtion predict / make it locally work (path problem)
             file_model_fastai = 'Saved_Models/model_fastai.pkl'
             learner_load = load_learner(file_model_fastai)
             option = st.selectbox('Choice of the plant', choice_plant)
@@ -90,9 +89,10 @@ def main():
             predecir_imagen(img_path, learner_load)
             show_confusion_matrix('matriz_confusion_fastai.npy', 'class_names_fastai.npy', "Fastai")
         elif classifier == 'VGG16 + SVM':
+            # TODO use load_history_classes_cm / organize code with a general funtion predict / make it locally work (path problem)
             from tensorflow.keras.models import load_model
-            file_model_vgg16_svm_intermediate_layer = '../GITHUB_LF/intermediate_layer_model.h5'
-            file_model_vgg16_svm = '../GITHUB_LF/vgg16+svm_classifier.pkl'
+            file_model_vgg16_svm_intermediate_layer = 'Saved_Models/intermediate_layer_model.h5'
+            file_model_vgg16_svm = 'Saved_Models/vgg16+svm_classifier.pkl'
             model_vgg16_svm_intermediate_layer = load_model(file_model_vgg16_svm_intermediate_layer, compile=False)
             model_vgg16_svm = joblib.load(file_model_vgg16_svm)
             option = st.selectbox('Choice of the plant', choice_plant)
