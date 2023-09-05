@@ -16,9 +16,9 @@ import json
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.models import load_model
 from fastai.vision.all import *
-import pathlib
-temp = pathlib.PosixPath
-pathlib.PosixPath = pathlib.WindowsPath
+#import pathlib
+#temp = pathlib.PosixPath
+#pathlib.PosixPath = pathlib.WindowsPath
 
 def main():
     st.title("Modelling")
