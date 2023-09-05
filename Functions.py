@@ -2,21 +2,17 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
 import matplotlib.pyplot as plt
 import itertools
-import matplotlib.cm as cm
-import tensorflow as tf
 from tensorflow.keras.preprocessing import image
-from tensorflow.keras.applications.vgg16 import preprocess_input, decode_predictions
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.models import load_model
+from tensorflow.keras.applications.vgg16 import preprocess_input#, decode_predictions
 from fastai.vision.all import *
 import pathlib
 temp = pathlib.PosixPath
 pathlib.PosixPath = pathlib.WindowsPath
 import random
-import cv2
+from PIL import Image
+#import cv2
 
 def preproces_image(img_path):
     img = image.load_img(img_path, target_size=(224, 224))
@@ -141,7 +137,7 @@ def show_stats_plots(df, plot_type):
     else:
         st.write("Plot type not recognized. Please choose from 'image_counts', 'max_size', 'min_size', 'average_sizes' or rgb_histogram.")
 
-# Definir una función para cargar imágenes y mostrar un conjunto de 5 imágenes aleatorias por directorio en Streamlit
+# Función para cargar imágenes y mostrar un conjunto de 5 imágenes aleatorias por directorio en Streamlit
 def load_and_show_images(path, size):
     # Iterate over the images in the directory
     for dirname, _, filenames in os.walk(path):
@@ -153,31 +149,30 @@ def load_and_show_images(path, size):
         random.shuffle(filenames)
         for filename in filenames:
             image_path = os.path.join(dirname, filename)
-            # Read the image using OpenCV
-            image = cv2.imread(image_path)
-            # Append the image to the directory images list
-            directory_images.append(image)
+            # Open and resize the image using PIL
+            with Image.open(image_path) as img:
+                img = img.resize(size)
+                img = img.convert("RGB")
+                image = plt.imread(image_path)  # Convert to numpy array for matplotlib
+                directory_images.append(image)
             # If there are 5 images in the list, show them and clear the list
             if len(directory_images) == 5:
-                show_image_mosaic(subdirectory_name, directory_images, size)
+                show_image_mosaic(subdirectory_name, directory_images)
                 directory_images.clear()
                 # Break the loop to only show 5 images per directory
                 break
 
 # Función para mostrar el mosaico de imágenes
-def show_image_mosaic(subdirectory_name, images, size):
+def show_image_mosaic(subdirectory_name, images):
     num_rows = 1
     num_cols = len(images)
     fig, axes = plt.subplots(num_rows, num_cols, figsize=(12, 6))
     fig.tight_layout()
     for j, image in enumerate(images):
-        image_resized = cv2.resize(image, size)
         ax = axes[j] if num_cols > 1 else axes
-        ax.imshow(cv2.cvtColor(image_resized, cv2.COLOR_BGR2RGB), extent=[0, 1, 0, 1])  # Ajusta el tamaño de la imagen
+        ax.imshow(image, extent=[0, 1, 0, 1])  # Ajusta el tamaño de la imagen
         ax.axis('off')
     # Ajusta el tamaño de la figura
     fig.subplots_adjust(wspace=0.05)
     st.write(f"{subdirectory_name}")
     st.pyplot(fig)
-
-

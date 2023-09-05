@@ -6,20 +6,14 @@ from Functions import show_confusion_matrix
 from Functions import show_accuracy_plot
 #
 import streamlit as st
-import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
 import joblib
 import os
 import pickle
 import matplotlib.pyplot as plt
 import json
-import matplotlib.cm as cm
-import tensorflow as tf
 from tensorflow.keras.preprocessing import image
-from tensorflow.keras.applications.vgg16 import preprocess_input, decode_predictions
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import load_model
 from fastai.vision.all import *
 import pathlib
@@ -67,7 +61,6 @@ def main():
             show_confusion_matrix('matriz_confusion.npy', 'category_to_label.json', "LeNET")
         elif classifier == 'VGG16':
             file_model_vgg16 = '../GITHUB_LF/model_vgg16.h5'
-            from tensorflow.keras.models import load_model
             model = load_model(file_model_vgg16, compile=False)
             option = st.selectbox('Choice of the plant', choice_plant)
             st.write('The chosen plant is :', option)
@@ -100,7 +93,6 @@ def main():
         elif classifier == 'VGG16 + SVM':
             file_model_vgg16_svm_intermediate_layer = '../GITHUB_LF/intermediate_layer_model.h5'
             file_model_vgg16_svm = '../GITHUB_LF/vgg16+svm_classifier.pkl'
-            from tensorflow.keras.models import load_model
             model_vgg16_svm_intermediate_layer = load_model(file_model_vgg16_svm_intermediate_layer, compile=False)
             model_vgg16_svm = joblib.load(file_model_vgg16_svm)
             option = st.selectbox('Choice of the plant', choice_plant)
