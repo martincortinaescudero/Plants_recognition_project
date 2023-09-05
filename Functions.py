@@ -6,14 +6,23 @@ import itertools
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.vgg16 import preprocess_input
 from fastai.vision.all import *
-#import pathlib
-#temp = pathlib.PosixPath
-#pathlib.PosixPath = pathlib.WindowsPath
 import random
 from PIL import Image
 import json
 import os
 import pickle
+from tensorflow.keras.models import load_model
+import h5py
+import joblib
+
+def load_fastai_model():
+    #import pathlib # only in windows
+    #temp = pathlib.PosixPath # only in windows
+    #pathlib.PosixPath = pathlib.WindowsPath # only in windows
+    file_model_fastai = 'Saved_Models/model_fastai.pkl'
+    learner_load = load_learner(file_model_fastai)
+    #pathlib.PosixPath = temp # only in windows
+    return learner_load
 
 def select_plant_for_prediction():
     choice_plant = ['Loose Silky-bent', 'Cleavers', 'Black-grass', 'Scentless Mayweed', 'Maize', 'Charlock', 'Sugar beet', 'Fat Hen', 'Small-flowered Cranesbill', 'Common wheat', 'Common Chickweed', 'Shepherd Purse']
@@ -28,14 +37,30 @@ def select_plant_for_prediction():
     st.pyplot()
     return img_path
 
-def load_fastai_model():
-    #import pathlib # only in windows
-    #temp = pathlib.PosixPath # only in windows
-    #pathlib.PosixPath = pathlib.WindowsPath # only in windows
-    file_model_fastai = 'Saved_Models/model_fastai.pkl'
-    learner_load = load_learner(file_model_fastai)
-    #pathlib.PosixPath = temp # only in windows
-    return learner_load
+def load_vgg16():
+        # Lista de nombres de archivos de las partes
+    part_filenames = ['Saved_Models/model_part01', 'Saved_Models/model_part02', 'Saved_Models/model_part03', 'Saved_Models/model_part04']
+    # Crear una lista para almacenar los contenidos de las partes
+    part_contents = []
+    # Leer cada parte y almacenar su contenido en la lista
+    for part_filename in part_filenames:
+        with open(part_filename, 'rb') as part_file:
+            part_contents.append(part_file.read())
+    # Combinar las partes en un solo contenido
+    full_file_data = b''.join(part_contents)
+    # Abre el archivo h5 directamente desde el contenido en memoria
+    with io.BytesIO(full_file_data) as in_memory_file:
+        with h5py.File(in_memory_file, 'r') as h5_file:
+            model = load_model(h5_file)
+    return model
+
+def load_vgg16_svm():
+    from tensorflow.keras.models import load_model
+    file_model_vgg16_svm_intermediate_layer = 'Saved_Models/intermediate_layer_model.h5'
+    file_model_vgg16_svm = 'Saved_Models/vgg16+svm_classifier.pkl'
+    model_vgg16_svm_intermediate_layer = load_model(file_model_vgg16_svm_intermediate_layer, compile=False)
+    model_vgg16_svm = joblib.load(file_model_vgg16_svm)
+    return model_vgg16_svm_intermediate_layer, model_vgg16_svm
 
 def preproces_image(img_path):
     img = image.load_img(img_path, target_size=(224, 224))
@@ -44,13 +69,25 @@ def preproces_image(img_path):
     return preprocess_input(x)
 
 # Define una función para cargar una imagen y hacer una predicción
-def predecir_imagen(ruta_de_la_imagen, learner):
-    # Cargar la imagen
-    img = PILImage.create(ruta_de_la_imagen)  # Utiliza PILImage.create en lugar de open_image
-    # Obtener la predicción
-    pred_class, pred_idx, outputs = learner.predict(img)
-    # Imprimir la clase predicha y las probabilidades de cada clase
-    st.write('Prediction :', pred_class)
+def predecir_imagen(ruta_de_la_imagen, model, model_type, route, file_name):
+    if (model_type == 'Resnet34'):
+        # Cargar la imagen
+        img = PILImage.create(ruta_de_la_imagen)  # Utiliza PILImage.create en lugar de open_image
+        # Obtener la predicción
+        pred_class, pred_idx, outputs = model.predict(img)
+        # Imprimir la clase predicha y las probabilidades de cada clase
+        st.write('Prediction :', pred_class)
+    if (model_type == 'VGG16'):
+        x = preproces_image(ruta_de_la_imagen)
+        # Obtener la prediccion segun mi modelo
+        class_index = np.argmax(model.predict(x))
+        loaded_category_to_label = np.load(os.path.join(route, file_name))
+        st.write('Prediction :', loaded_category_to_label[class_index])
+    if (model_type == 'VGG16+SVM'):
+        features_of_image = model[0].predict(preproces_image(ruta_de_la_imagen))
+        prediction = model[1].predict(features_of_image)
+        loaded_category_to_label = np.load(os.path.join(route, 'class_names_VGG16+SVM.npy'))
+        st.write('Prediction :', loaded_category_to_label[prediction-1])
 
 def show_plot_history_list(history_list):
     # Crear una figura y ejes para el gráfico

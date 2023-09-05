@@ -7,18 +7,12 @@ from Functions import show_accuracy_loss_plot
 from Functions import load_history_classes_cm
 from Functions import select_plant_for_prediction
 from Functions import load_fastai_model
+from Functions import load_vgg16
+from Functions import load_vgg16_svm
 import streamlit as st
-import numpy as np
 import matplotlib.pyplot as plt
-import joblib
-import os
 import matplotlib.pyplot as plt
-from tensorflow.keras.preprocessing import image
-from tensorflow.keras.models import load_model
 from fastai.vision.all import *
-#import pathlib
-#temp = pathlib.PosixPath
-#pathlib.PosixPath = pathlib.WindowsPath
 
 def main():
     st.title("Modelling")
@@ -26,7 +20,6 @@ def main():
     st.set_option('deprecation.showPyplotGlobalUse', False)
     def prediction(classifier):
         route = "Saved_Models"
-        choice_plant = ['Loose Silky-bent', 'Cleavers', 'Black-grass', 'Scentless Mayweed', 'Maize', 'Charlock', 'Sugar beet', 'Fat Hen', 'Small-flowered Cranesbill', 'Common wheat', 'Common Chickweed', 'Shepherd Purse']
         if classifier == 'Random Forest':
             show_confusion_matrix('matriz_confusion_rf_classifier.npy', 'class_names.npy', "Random Forest")
         elif classifier == 'SVM':
@@ -42,77 +35,22 @@ def main():
             show_accuracy_loss_plot(history_list)
             show_confusion_matrix_from_data(loaded_cm, classes, "LeNET")
         elif classifier == 'VGG16':
-            # TODO use load_history_classes_cm / show history /organize code with a general funtion predict
-            from tensorflow.keras.models import load_model
-            import h5py
-            # Lista de nombres de archivos de las partes
-            part_filenames = ['Saved_Models/model_part01', 'Saved_Models/model_part02', 'Saved_Models/model_part03', 'Saved_Models/model_part04']
-            # Crear una lista para almacenar los contenidos de las partes
-            part_contents = []
-            # Leer cada parte y almacenar su contenido en la lista
-            for part_filename in part_filenames:
-                with open(part_filename, 'rb') as part_file:
-                    part_contents.append(part_file.read())
-            # Combinar las partes en un solo contenido
-            full_file_data = b''.join(part_contents)
-            # Abre el archivo h5 directamente desde el contenido en memoria
-            with io.BytesIO(full_file_data) as in_memory_file:
-                with h5py.File(in_memory_file, 'r') as h5_file:
-                    model = load_model(h5_file)
-            #option = st.selectbox('Choice of the plant', choice_plant)
-            #st.write('The chosen plant is :', option)
-            ## image path
-            #img_path = os.path.join("Sample_images", option, "image1.jpg")
-            ## Display original image
-            #img = image.load_img(img_path, target_size=(224, 224))
-            #plt.matshow(img)
-            #st.set_option('deprecation.showPyplotGlobalUse', False)
-            #st.pyplot()
+            # TODO show history
+            model = load_vgg16()
             img_path = select_plant_for_prediction()
-            x = preproces_image(img_path)
-            # Obtener la prediccion segun mi modelo
-            class_index = np.argmax(model.predict(x))
-            loaded_category_to_label = np.load(os.path.join(route, 'class_names_vgg16.npy'))
-            st.write('Prediction :', loaded_category_to_label[class_index])
+            predecir_imagen(img_path, model, 'VGG16', "Saved_Models", 'class_names_vgg16.npy')
             show_confusion_matrix('matriz_confusion_vgg16.npy', 'class_names_vgg16.npy', "VGG16")
         elif classifier == 'Fastai':
-            # TODO use load_history_classes_cm / show history /organize code with a general funtion predict / make it locally work (path problem in load_learner)
-            #file_model_fastai = 'Saved_Models/model_fastai.pkl'
-            #learner_load = load_learner(file_model_fastai)
+            # TODO show history
             learner_load = load_fastai_model()
-            #option = st.selectbox('Choice of the plant', choice_plant)
-            #st.write('The chosen plant is :', option)
-            #img_path = os.path.join("Test_original", option, "image1.jpg")
-            ## Display original image
-            #img = image.load_img(img_path, target_size=(224, 224))
-            #plt.matshow(img)
-            #st.set_option('deprecation.showPyplotGlobalUse', False)
-            #st.pyplot()
             img_path = select_plant_for_prediction()
-            predecir_imagen(img_path, learner_load)
+            predecir_imagen(img_path, learner_load, 'Resnet34', null, null)
             show_confusion_matrix('matriz_confusion_fastai.npy', 'class_names_fastai.npy', "Fastai")
         elif classifier == 'VGG16 + SVM':
-            # TODO use load_history_classes_cm / organize code with a general funtion predict
-            from tensorflow.keras.models import load_model
-            file_model_vgg16_svm_intermediate_layer = 'Saved_Models/intermediate_layer_model.h5'
-            file_model_vgg16_svm = 'Saved_Models/vgg16+svm_classifier.pkl'
-            model_vgg16_svm_intermediate_layer = load_model(file_model_vgg16_svm_intermediate_layer, compile=False)
-            model_vgg16_svm = joblib.load(file_model_vgg16_svm)
-            #option = st.selectbox('Choice of the plant', choice_plant)
-            #st.write('The chosen plant is :', option)
-            ## image path
-            #img_path = os.path.join("Sample_images", option, "image1.jpg")
-            ## Display original image
-            #img = image.load_img(img_path, target_size=(224, 224))
-            #plt.matshow(img)
-            #st.set_option('deprecation.showPyplotGlobalUse', False)
-            #st.pyplot()
+            model = load_vgg16_svm()
             # Obtener la prediccion segun mi modelo
             img_path = select_plant_for_prediction()
-            features_of_image = model_vgg16_svm_intermediate_layer.predict(preproces_image(img_path))
-            prediction = model_vgg16_svm.predict(features_of_image)
-            loaded_category_to_label = np.load(os.path.join(route, 'class_names_VGG16+SVM.npy'))
-            st.write('Prediction :', loaded_category_to_label[prediction-1])
+            predecir_imagen(img_path, model, 'VGG16+SVM', "Saved_Models", 'class_names_VGG16+SVM.npy')
             show_confusion_matrix('matriz_confusion_VGG16+SVM.npy', 'class_names_VGG16+SVM.npy', "VGG16+SVM")
 
     choice = ['Random Forest', 'SVM', "KNN-PCA", 'A simple CNN', 'LeNet', 'VGG16', 'Fastai', 'VGG16 + SVM']
