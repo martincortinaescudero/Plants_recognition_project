@@ -7,12 +7,11 @@ import itertools
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.vgg16 import preprocess_input#, decode_predictions
 from fastai.vision.all import *
-import pathlib
-temp = pathlib.PosixPath
-pathlib.PosixPath = pathlib.WindowsPath
+#import pathlib
+#temp = pathlib.PosixPath
+#pathlib.PosixPath = pathlib.WindowsPath
 import random
 from PIL import Image
-#import cv2
 
 def preproces_image(img_path):
     img = image.load_img(img_path, target_size=(224, 224))
