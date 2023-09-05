@@ -3,3 +3,5 @@ tensorflow==2.13.0
 matplotlib
 seaborn
 joblib
+fastai
+PIL
