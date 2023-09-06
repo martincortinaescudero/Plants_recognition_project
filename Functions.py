@@ -17,12 +17,12 @@ import joblib
 import random
 
 def load_fastai_model():
-    #import pathlib # only in windows
-    #temp = pathlib.PosixPath # only in windows
-    #pathlib.PosixPath = pathlib.WindowsPath # only in windows
+    import pathlib # only in windows
+    temp = pathlib.PosixPath # only in windows
+    pathlib.PosixPath = pathlib.WindowsPath # only in windows
     file_model_fastai = 'Saved_Models/model_fastai.pkl'
     learner_load = load_learner(file_model_fastai)
-    #pathlib.PosixPath = temp # only in windows
+    pathlib.PosixPath = temp # only in windows
     return learner_load
 
 def select_plant_for_prediction():
