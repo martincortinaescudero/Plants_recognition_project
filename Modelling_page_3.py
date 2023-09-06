@@ -3,6 +3,7 @@ from Functions import predecir_imagen
 from Functions import show_confusion_matrix
 from Functions import show_confusion_matrix_from_data
 from Functions import show_accuracy_loss_plot
+from Functions import show_accuracy_loss_plot_fastai
 from Functions import load_history_classes_cm
 from Functions import select_plant_for_prediction
 from Functions import load_fastai_model
@@ -34,17 +35,19 @@ def main():
             show_accuracy_loss_plot(history_list)
             show_confusion_matrix_from_data(loaded_cm, classes, "LeNET")
         elif classifier == 'VGG16':
-            # TODO show history
+            history_list, loaded_cm, classes = load_history_classes_cm(route, 'histories_VGG16_balanced_training_data.pkl', 'matriz_confusion_vgg16.npy', 'class_names_vgg16.npy')
+            show_accuracy_loss_plot(history_list, accuracy = 'acc')
             model = load_vgg16()
             img_path = select_plant_for_prediction()
             predecir_imagen(img_path, model, 'VGG16', "Saved_Models", 'class_names_vgg16.npy')
-            show_confusion_matrix('matriz_confusion_vgg16.npy', 'class_names_vgg16.npy', "VGG16")
+            show_confusion_matrix_from_data(loaded_cm, classes, "VGG16")
         elif classifier == 'Fastai':
-            # TODO show history
+            history_list, loaded_cm, classes = load_history_classes_cm(route, 'histories_fastai.pkl', 'matriz_confusion_fastai.npy', 'class_names_fastai.npy')
+            show_accuracy_loss_plot_fastai(history_list)
             learner_load = load_fastai_model()
             img_path = select_plant_for_prediction()
             predecir_imagen(img_path, learner_load, 'Resnet34', null, null)
-            show_confusion_matrix('matriz_confusion_fastai.npy', 'class_names_fastai.npy', "Fastai")
+            show_confusion_matrix_from_data(loaded_cm, classes, "Fastai")
         elif classifier == 'VGG16 + SVM':
             model = load_vgg16_svm()
             # Obtener la prediccion segun mi modelo

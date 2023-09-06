@@ -96,7 +96,7 @@ def predecir_imagen(ruta_de_la_imagen, model, model_type, route, file_name):
         loaded_category_to_label = np.load(os.path.join(route, 'class_names_VGG16+SVM.npy'))
         st.write('Prediction :', loaded_category_to_label[prediction-1][0])
 
-def show_accuracy_loss_plot(history_list):
+def show_accuracy_loss_plot(history_list, accuracy = 'accuracy'):
     # Crear una figura y ejes para el gráfico
     fig, ax1 = plt.subplots(figsize=(10, 6))
     history_acc = []
@@ -105,8 +105,8 @@ def show_accuracy_loss_plot(history_list):
     history_val_loss = []
     # Recopilar las precisiones (accuracy) y pérdidas (loss) de todas las historias en history_list
     for history in history_list:
-        history_acc.extend(history['accuracy'])
-        history_val_acc.extend(history['val_accuracy'])
+        history_acc.extend(history[accuracy])
+        history_val_acc.extend(history['val_' + accuracy])
         history_loss.extend(history['loss'])
         history_val_loss.extend(history['val_loss'])
     epochs = len(history_acc)
@@ -126,6 +126,33 @@ def show_accuracy_loss_plot(history_list):
     ax2.legend(loc='upper right')
     # Utilizar Streamlit para mostrar la figura
     st.pyplot(fig)
+
+def show_accuracy_loss_plot_fastai(history):
+    # Acceder a los datos de precisión de validación
+    history_loss = history['train_loss']
+    history_acc = history['train_accuracy']
+    history_val_loss = history['valid_loss']
+    history_val_acc = history['valid_accuracy']
+    # Crear una figura y ejes para el gráfico
+    fig, ax1 = plt.subplots(figsize=(10, 6))
+    epochs = len(history_acc)
+    # Ejes para la precisión
+    ax1.set_xlabel('Epochs')
+    ax1.set_ylabel('Accuracy', color='blue')
+    ax1.plot(range(1, epochs + 1), history_acc, label='Training Accuracy', color='blue')
+    ax1.plot(range(1, epochs + 1), history_val_acc, label='Validation Accuracy', color='red')
+    ax1.tick_params(axis='y', labelcolor='blue')
+    ax1.legend(loc='upper left')
+    # Crear un segundo eje y eje para la pérdida
+    ax2 = ax1.twinx()
+    ax2.set_ylabel('Loss', color='green')
+    ax2.plot(range(1, epochs + 1), history_loss, label='Training Loss', color='green')
+    ax2.plot(range(1, epochs + 1), history_val_loss, label='Validation Loss', color='orange')
+    ax2.tick_params(axis='y', labelcolor='green')
+    ax2.legend(loc='upper right')
+    # Utilizar Streamlit para mostrar la figura
+    st.pyplot(fig)
+
 
 def show_confusion_matrix(matrix_file, class_names_file, title):
     route = "Saved_Models"
