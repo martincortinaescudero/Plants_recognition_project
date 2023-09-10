@@ -27,7 +27,7 @@ def load_fastai_model():
 
 def select_plant_for_prediction():
     choice_plant = ['Loose Silky-bent', 'Cleavers', 'Black-grass', 'Scentless Mayweed', 'Maize', 'Charlock', 'Sugar beet', 'Fat Hen', 'Small-flowered Cranesbill', 'Common wheat', 'Common Chickweed', 'Shepherd Purse']
-    option = st.selectbox('Choice of the plant', choice_plant)
+    option = st.selectbox('**CHOOSE A PLANT TO MAKE A PREDICTION**', choice_plant)
     st.write('The chosen plant is:', option)
     # Get a list of all image files in the selected directory
     plant_directory = os.path.join("Test_original", option)
@@ -83,18 +83,18 @@ def predecir_imagen(ruta_de_la_imagen, model, model_type, route, file_name):
         # Obtener la predicción
         pred_class, pred_idx, outputs = model.predict(img)
         # Imprimir la clase predicha y las probabilidades de cada clase
-        st.write('Prediction :', pred_class)
+        st.write('Prediction with model Resnet34:', pred_class)
     if (model_type == 'VGG16'):
         x = preproces_image(ruta_de_la_imagen)
         # Obtener la prediccion segun mi modelo
         class_index = np.argmax(model.predict(x))
         loaded_category_to_label = np.load(os.path.join(route, file_name))
-        st.write('Prediction :', loaded_category_to_label[class_index])
+        st.write('Prediction with model VGG16:', loaded_category_to_label[class_index])
     if (model_type == 'VGG16+SVM'):
         features_of_image = model[0].predict(preproces_image(ruta_de_la_imagen))
         prediction = model[1].predict(features_of_image)
         loaded_category_to_label = np.load(os.path.join(route, 'class_names_VGG16+SVM.npy'))
-        st.write('Prediction :', loaded_category_to_label[prediction-1][0])
+        st.write('Prediction with model VGG16+SVM:', loaded_category_to_label[prediction-1][0])
 
 def show_accuracy_loss_plot(history_list, accuracy = 'accuracy'):
     # Crear una figura y ejes para el gráfico
@@ -223,7 +223,6 @@ def show_stats_plots(df, plot_type):
         "max_size": ("Maximum Image Sizes (pixels)", df['max_size']),
         "min_size": ("Minimum Image Sizes (pixels)", df['min_size']),
         "average_sizes": ("Average Image Sizes", (df['avg_height'], df['avg_width'])),
-        #"RGB": ("Histogram of RGB Channels", (df['R'], df['G'], df['B'])),
         "rgb_histogram": ("Histogram of RGB Channels", df[['B', 'G', 'R']])
     }
     if plot_type in plot_functions:
