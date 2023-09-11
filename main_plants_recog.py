@@ -7,6 +7,8 @@ from Modelling_page_3 import main as Modelling_page_3_main
 from Interpreting_page_4 import main as Interpreting_page_4_main
 from Conclusion import main as Conclusion_main
 
+st.set_page_config(layout="wide")
+
 st.title("Plant seeds classification project")
 st.sidebar.title("Table of contents")
 pages = ["Introduction", "Exploration", "Data Visualization", "Modelling", "Interpreting", "Conclusion"]

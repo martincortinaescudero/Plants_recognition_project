@@ -14,8 +14,6 @@ import matplotlib.pyplot as plt
 import matplotlib.pyplot as plt
 from fastai.vision.all import *
 
-st.set_page_config(layout="wide")
-
 def main():
 
     models_intro = """
